@@ -1,30 +1,31 @@
 var chai = require('chai'),
 	sinon = require('sinon'),
 	sinonChai = require('sinon-chai'),
-	expect = chai.expect;
+	expect = chai.expect,
+	AuthorModel = require('../../../models/author/author.model');
 
 chai.use(sinonChai);
 
-it('should be able to require the AuthorModel module', function (done) {
-	try {
-		AuthorModel = require('../../models/author.model');
-	} catch (e) {
-		done(e);
-	}
-});
-
 describe('Author Model', function () {
 	var sandbox,
-		AuthorModel,
 		author;
 
 	beforeEach(function (done) {
 		sandbox = sinon.sandbox.create();
-		author = new AuthorModel();
+		author = AuthorModel.GetInstance({
+			id: 0,
+			firstname: 'Tester',
+			lastname: 'McTesterson',
+			alias: 'Test',
+			phone: '555-555-5555',
+			email: 'test@test.com',
+			location: 'USA',
+			registerDate: new Date()
+		});
 		done();
 	});
 
-	describe('#getAuthorInfo(callback)', function () {
+	describe('#getAuthorInfo()', function () {
 		it('should return an author model', function () {
 			try {
 				var authorInfo = author.getAuthorInfo(),
@@ -35,7 +36,8 @@ describe('Author Model', function () {
 						'alias',
 						'email',
 						'phone',
-						'location'
+						'location',
+						'registerDate'
 					];
 			} catch (e) {
 				return e;
@@ -44,39 +46,25 @@ describe('Author Model', function () {
 			expect(authorInfo).to.contain.all.keys(expectedKeys);
 		});
 	});
-
-	describe('#getRecentPosts(num, callback)', function () {
-		var recentPosts;
-
-		before(function (done) {
-			recentPosts = author.getRecentPosts(5, done);
-		});
-
-		it('should return a list of recent posts', function (done) {
-			try {
-				var expectedKeys = [
-					'count',
-					'posts'
-				];
-			} catch (e) {
-				return e;
-			}
-			expect(recentPosts).to.contain.all.keys(expectedKeys);
-		});
-	});
-
-	describe('#updateField(field, value, callback)', function () {
-		before(function (done) {
-			author.updateField('name', 'tester', done);
-		});
-
-		it('should update the specified field with the provided value', function (done) {
-			try {
-				expect(author.name).to.equal('tester');
+	
+	describe('#save(callback)', function(done) {
+		var savedModel;
+		
+		before(function(done){
+			author.save(function(r) {
+				savedModel = r;
 				done();
-			} catch (e) {
-				return e;
-			}
+			});
+		});
+		
+		it('should return the saved model', function(done) {
+			
+			// clear the registration date as the comparison of Date bojects breaks this test
+			savedModel.registerDate = '';
+			author.registerDate = '';
+			
+			expect(savedModel).to.eql(author);
+			done();
 		});
 	});
 

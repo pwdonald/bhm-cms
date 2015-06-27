@@ -13,6 +13,12 @@
     },
     "handlebars/handlebars.d.ts": {
       "commit": "09ba0bab1ee417eb44e1c35caa493ae6727a2ff2"
+    },
+    "serve-static/serve-static.d.ts": {
+      "commit": "2c96e9e77765b72ce43ab8163f42e504f3e2facb"
+    },
+    "mime/mime.d.ts": {
+      "commit": "2c96e9e77765b72ce43ab8163f42e504f3e2facb"
     }
   }
 }

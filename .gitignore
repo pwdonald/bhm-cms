@@ -30,3 +30,7 @@ node_modules
 npm-debug.log
 
 typings
+
+models/**/*.js
+models/**/*.js.map
+
