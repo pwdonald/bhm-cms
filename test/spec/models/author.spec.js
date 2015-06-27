@@ -20,25 +20,25 @@ describe('Author Model', function () {
 			phone: '555-555-5555',
 			email: 'test@test.com',
 			location: 'USA',
-			registerDate: new Date()
+			registerDate: new Date(2015, 1, 1)
 		});
 		done();
 	});
 
 	describe('#getAuthorInfo()', function () {
 		it('should return an author model', function () {
+			var expectedKeys = [
+				'id',
+				'firstname',
+				'lastname',
+				'alias',
+				'email',
+				'phone',
+				'location',
+				'registerDate'
+			];
 			try {
-				var authorInfo = author.getAuthorInfo(),
-					expectedKeys = [
-						'id',
-						'firstname',
-						'lastname',
-						'alias',
-						'email',
-						'phone',
-						'location',
-						'registerDate'
-					];
+				var authorInfo = author.getAuthorInfo();
 			} catch (e) {
 				return e;
 			}
@@ -46,23 +46,18 @@ describe('Author Model', function () {
 			expect(authorInfo).to.contain.all.keys(expectedKeys);
 		});
 	});
-	
-	describe('#save(callback)', function(done) {
+
+	describe('#save(callback)', function (done) {
 		var savedModel;
-		
-		before(function(done){
-			author.save(function(r) {
+
+		before(function (done) {
+			author.save(function (r) {
 				savedModel = r;
 				done();
 			});
 		});
-		
-		it('should return the saved model', function(done) {
-			
-			// clear the registration date as the comparison of Date bojects breaks this test
-			savedModel.registerDate = '';
-			author.registerDate = '';
-			
+
+		it('should return the saved model', function (done) {
 			expect(savedModel).to.eql(author);
 			done();
 		});

@@ -13,7 +13,7 @@ class BaseModel implements IBaseModel {
 		// TODO: implement save in data layer
 		setTimeout(() => {
 			callback(this);
-		}, 1000);
+		}, 100);
 	}
 }
 
