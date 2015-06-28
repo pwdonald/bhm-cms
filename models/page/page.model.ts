@@ -1,5 +1,8 @@
+/// <reference path="../../_references.d.ts" />
+
 import BaseModel = require('../base.model');
 import AuthorModel = require('../author/author.model');
+import SectionModel = require('../section/section.model');
 
 class PageDTO implements IPageDTO {
 	constructor(public id: string,
@@ -14,7 +17,7 @@ class PageDTO implements IPageDTO {
 		public sections: Array<ISectionDTO>) { }
 }
 
-class PageModel extends BaseModel implements IPage {
+class PageModel extends BaseModel implements IPage, IPageDTO {
 
 	private _title: string;
 	public get title(): string {
@@ -108,27 +111,27 @@ class PageModel extends BaseModel implements IPage {
 			this.modifiedBy.getAuthorInfo(),
 			this.views,
 			this.sections.map((child: ISection): ISectionDTO => {
-				return (<ISectionDTO> child); // TODO: fix this when I implement sections
+				return child.getSectionInfo();
 			})
 			);
 	}
 
 	addChildSection(section: ISectionDTO, callback: (_updatedPage: IPage) => {}) {
-		this.sections.push((<ISection>section)); // TODO: replace this with getinstance call
+		this.sections.push(SectionModel.GetInstance(section));
 		this.save(callback);
 	}
-	
+
 	removeChildSection(id: string, callback: (_updatedPage: IPage) => {}) {
 		this.sections = this.sections.filter((value: ISection) => {
 			return (value.id.trim() === id.trim() ? false : true);
 		});
-		
+
 		this.save(callback);
 	}
-	
+
 	static GetInstance(data: any): IPage {
 		var dto: IPageDTO = (<IPageDTO> data);
-		
+
 		var _instance = new PageModel();
 		_instance.id = dto.id;
 		_instance.title = dto.title;
@@ -140,9 +143,9 @@ class PageModel extends BaseModel implements IPage {
 		_instance.modifiedBy = AuthorModel.GetInstance(dto.modifiedBy);
 		_instance.views = dto.views;
 		_instance.sections = dto.sections.map((dataSection) => {
-			return (<ISection>dataSection); // TODO: replace this with get instance
+			return SectionModel.GetInstance(dataSection);
 		});
-		
+
 		return _instance;
 	}
 

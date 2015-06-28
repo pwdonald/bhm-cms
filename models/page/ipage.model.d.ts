@@ -1,7 +1,6 @@
 /// <reference path="../../_references.d.ts" />
 
-interface IPageDTO {
-	id: string;
+interface IPageDTO extends IBaseModelDTO {
 	title: string;
 	description: string;
 	tags: string;

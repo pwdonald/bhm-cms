@@ -2,6 +2,7 @@ var chai = require('chai'),
 	sinon = require('sinon'),
 	sinonChai = require('sinon-chai'),
 	expect = chai.expect,
+	SectionModel = require('../../../models/section/section.model'),
 	PageModel = require('../../../models/page/page.model');
 
 chai.use(sinonChai);
@@ -9,23 +10,34 @@ chai.use(sinonChai);
 describe('Page Model', function () {
 	var sandbox,
 		page,
-		existingSection = { id: '0' };
+		existingSection = {
+			id: '0',
+			author: {
+				id: '0'
+			},
+			modifiedBy: {
+				id: '0'
+			}
+		};
 
-	beforeEach(function (done) {
+	beforeEach(function () {
 		sandbox = sinon.sandbox.create();
 		page = PageModel.GetInstance({
 			id: 0,
 			title: 'Test Page',
 			description: 'Just a test page.',
 			tags: 'test, page',
-			author: {},
+			author: { id: '0' },
 			created: new Date(2013, 1, 1),
 			modified: new Date(2013, 1, 1),
-			modifiedBy: {},
+			modifiedBy: { id: '0' },
 			views: 0,
 			sections: [existingSection]
 		});
-		done();
+	});
+
+	afterEach(function () {
+		sandbox.restore();
 	});
 
 	describe('#getPageInfo()', function () {
@@ -49,14 +61,31 @@ describe('Page Model', function () {
 	});
 
 	describe('#addChildSection(section, callback)', function () {
-		var childSection = {id:'1'},
-			updatedPage;
-
+		var childSection = {
+			id: '1',
+			author: {
+				id: '1'
+			},
+			modifiedBy: {
+				id: '2'
+			}
+		},
+			updatedPage,
+			instanceStub;
+			
 		before(function (done) {
+			instanceStub = sandbox.stub(SectionModel, 'GetInstance', function (data) {
+				return data;
+			});
+
 			page.addChildSection(childSection, function (_updatedPage) {
 				updatedPage = _updatedPage;
 				done();
 			});
+		});
+		
+		after(function(){
+			instanceStub.restore();
 		});
 
 		it('should add the child section to the page', function () {
@@ -66,15 +95,15 @@ describe('Page Model', function () {
 
 	describe('#removeChildSection(id, callback)', function () {
 		var updatedPage;
-		
-		before(function(done){
-			page.removeChildSection(existingSection.id, function(_updatedPage) {
+
+		before(function (done) {
+			page.removeChildSection(existingSection.id, function (_updatedPage) {
 				updatedPage = _updatedPage;
 				done();
 			});
 		});
-		
-		it('should remove the child section from the page', function(){
+
+		it('should remove the child section from the page', function () {
 			expect(updatedPage.sections).to.not.include(existingSection);
 		});
 	});
@@ -94,11 +123,4 @@ describe('Page Model', function () {
 			done();
 		});
 	});
-
-	afterEach(function (done) {
-		sandbox.restore();
-		done();
-	});
-
-
 });

@@ -14,7 +14,7 @@ class AuthorDTO implements IAuthorDTO {
 	}
 }
 
-class AuthorModel extends BaseModel implements IAuthor {
+class AuthorModel extends BaseModel implements IAuthor, IAuthorDTO {
 	private _firstname: string;
 	public get firstname(): string {
 		return this._firstname;

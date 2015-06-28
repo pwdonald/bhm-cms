@@ -6,7 +6,7 @@ var chai = require('chai'),
 
 chai.use(sinonChai);
 
-describe('', function() {
+describe('Section Model', function() {
 	var sandbox,
 		section;
 		
@@ -16,7 +16,12 @@ describe('', function() {
 			id: 0,
 			title: 'Test Section',
 			subtitle: 'Sub Test',
-			content: {
+			author: {id: '0'},
+			createdOn: new Date(2015, 1, 1),
+			modifiedBy: {id:'0'},
+			modifiedOn: new Date(2015, 1, 2),
+			markdown: 'down',
+			otherContent: {
 				'listings': [
 					'listitem1',
 					'listitem2'
@@ -34,7 +39,12 @@ describe('', function() {
 			'id',
 			'title',
 			'subtitle',
-			'content'
+			'author',
+			'createdOn',
+			'modifiedOn',
+			'modifiedBy',
+			'markdown',
+			'otherContent'
 		];
 		
 		it('should return section model dto', function() {
