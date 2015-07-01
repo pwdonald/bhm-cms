@@ -7,11 +7,28 @@ var chai = require('chai'),
 chai.use(sinonChai);
 
 describe('Author Service', function() {
-	var sandbox;
+	var sandbox,
+		service;
+	
+	beforeEach(function() {
+		sandbox = sinon.sandbox.create();
+		service = AuthorService.GetInstance();
+	});
 	
 	describe('#create(id, dto)', function() {
+		var authorDto = {},
+			newAuthor;
+		
+		before(function(done) {
+			service.post(id, dto, function(_author) {
+				newAuthor = _author;
+				done();
+			});
+		});
 		it('should create a new author with id', function(done) {
-			
+			expect(service.post).to.have.been.called;
+			expect(newAuthor).to.equal(authorDto);
+			done();
 		});
 	});
 	
