@@ -7,4 +7,5 @@
 /// <reference path="models/author/iauthor.model.d.ts" />
 /// <reference path="models/section/isection.model.d.ts" />
 /// <reference path="models/page/ipage.model.d.ts" />
+/// <reference path="services/ibase.service.d.ts" />
 

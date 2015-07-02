@@ -19,6 +19,9 @@
     },
     "mime/mime.d.ts": {
       "commit": "2c96e9e77765b72ce43ab8163f42e504f3e2facb"
+    },
+    "sqlite3/sqlite3.d.ts": {
+      "commit": "4ba73ef59f93e38a70573cfc46375de37b004635"
     }
   }
 }
