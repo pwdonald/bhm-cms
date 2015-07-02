@@ -2,8 +2,8 @@
 
 
 interface  IBaseService {
-	get(id: string, callback: (_dto: IBaseModelDTO) => {});
-	getList(searchTerm: string, pageNumber: number, callback: (_dto: IBaseModelDTO) => {});
-	update(id: string, dto: IBaseModelDTO, callback: (_dto: IBaseModelDTO) => {});
-	remove(id: string, callback: (success: boolean) => {})
+	get(id: string, callback: (_dto: IBaseModelDTO) => {}): void;
+	getList(searchTerm: string, pageNumber: number, callback: (_dto: IBaseModelDTO) => {}): void;
+	update(id: string, dto: IBaseModelDTO, callback: (_dto: IBaseModelDTO) => {}): void;
+	remove(id: string, callback: (success: boolean) => {}): void;
 }

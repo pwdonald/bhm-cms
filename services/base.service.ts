@@ -1,6 +1,8 @@
 /// <reference path="../_references.d.ts" />
 
-class BaseService implements IBaseService {
+import sqlite3 = require('sqlite3');
+
+class BaseService {
 	get(id: string, callback: (_dto: IBaseModelDTO) => {}) {
 		
 	}

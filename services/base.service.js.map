@@ -1,0 +1,1 @@
+{"version":3,"file":"base.service.js","sourceRoot":"","sources":["base.service.ts"],"names":["BaseService","BaseService.constructor","BaseService.get"],"mappings":"AAAA,4CAA4C;AAI5C;IAAAA;IAIAC,CAACA;IAHAD,yBAAGA,GAAHA,UAAIA,EAAUA,EAAEA,QAAqCA;IAErDE,CAACA;IACFF,kBAACA;AAADA,CAACA,AAJD,IAIC;AAEoB,AAArB,iBAAS,WAAW,CAAC"}
