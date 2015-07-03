@@ -11,9 +11,16 @@ describe('Author Service', function () {
 		service,
 		FAKE_ID = 0;
 
-	beforeEach(function () {
+	beforeEach(function (done) {
 		sandbox = sinon.sandbox.create();
-		service = AuthorService.GetInstance();
+		try {
+			AuthorService.GetInstance((service) => {
+				service = service;
+				done();
+			});
+		} catch (e) {
+			done(e);
+		}
 	});
 
 	afterEach(function () {

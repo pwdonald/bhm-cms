@@ -31,6 +31,30 @@ class BaseService implements IBaseService {
 		});
 	}
 
+	create(dto: IBaseModelDTO, callback: (err: Error, result: IBaseModelDTO) => void): void {
+		var keys: Array<string> = Object.getOwnPropertyNames(dto);
+
+		keys = keys.filter((key) => {
+			if (key === 'id') {
+				return false;
+			}
+
+			return true;
+		});
+
+		var sqlQuery: string = util.format('INSERT INTO %s (%s) VALUES (%s)',
+			this.entityName,
+			keys.join(','),
+			keys.map((key) => {
+				return '\'' + dto[key] + '\''
+			}));
+			
+		this.dataAcceesLayer.query<IBaseModelDTO>(sqlQuery, [], (err: Error, results: Array<IBaseModelDTO>) => {
+			callback(err, results[0]);
+		});
+
+	}
+
 	get(id: string, callback: (err: Error, result: IBaseModelDTO) => {}): void {
 		var sqlQuery: string = util.format('SELECT * FROM %s WHERE id = %s', this.entityName, id);
 		this.dataAcceesLayer.get<IBaseModelDTO>(sqlQuery, [], callback);
@@ -56,21 +80,19 @@ class BaseService implements IBaseService {
 		var dtoKeys: string[] = Object.getOwnPropertyNames(dto);
 
 		dtoKeys.forEach((key: string, index: number) => {
-			if (index > 0) {
-				sqlQuery.concat(util.format(', %s = \'%s\'', key, dto[key]));
-			} else {
-				sqlQuery.concat(util.format('SET %s = \'%s\', ', key, dto[<string>key]));
+			if (key !== 'id') {
+				if (index > 0) {
+					sqlQuery.concat(util.format(', %s = \'%s\'', key, dto[key]));
+				} else {
+					sqlQuery.concat(util.format('SET %s = \'%s\', ', key, dto[<string>key]));
+				}
 			}
 		});
 
 		sqlQuery.concat(util.format(' WHERE %s = %s', 'id', id));
 
 		this.dataAcceesLayer.query<IBaseModelDTO>(sqlQuery, [], (err: Error, results: Array<IBaseModelDTO>) => {
-			if (err) {
-				callback(err, null);
-			}
-
-			callback(null, results[0]);
+			callback(err, results[0]);
 		});
 	}
 
