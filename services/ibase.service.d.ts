@@ -2,8 +2,10 @@
 
 
 interface  IBaseService {
-	get(id: string, callback: (_dto: IBaseModelDTO) => {}): void;
-	getList(searchTerm: string, pageNumber: number, callback: (_dto: IBaseModelDTO) => {}): void;
-	update(id: string, dto: IBaseModelDTO, callback: (_dto: IBaseModelDTO) => {}): void;
-	remove(id: string, callback: (success: boolean) => {}): void;
+	entityName: string;
+	
+	get(id: string, callback: (err: Error, _dto: IBaseModelDTO) => void): void;
+	getList(searchTerm: string, column: IColumn, pageNumber: number, perPage: number, callback: (err: Error, _dto: Array<IBaseModelDTO>) => void): void;
+	update(id: string, dto: IBaseModelDTO, callback: (err: Error, _dto: IBaseModelDTO) => void): void;
+	remove(id: string, callback: (err: Error, success: boolean) => void): void;
 }

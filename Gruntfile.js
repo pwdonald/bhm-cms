@@ -4,7 +4,8 @@ module.exports = function(grunt) {
 			dev: {
 				options: {
 					module: 'commonjs',
-					noImplicitAny: 'true'
+					noImplicitAny: 'true',
+					suppressImplicitAnyIndexErrors: true
 				},
 				src: ['**/**.ts', '!node_modules/**/*.ts']
 			}

@@ -71,11 +71,11 @@ class Sqlite3DAL implements IDAL {
 		});
 	}
 	
-	get<T>(statement: string, parameters: Array<IColumn>, callback: (err: Error, result: T) => {}): void {
+	get<T>(statement: string, parameters: Array<IColumn>, callback: (err: Error, result: T) => void): void {
 		this._db.get(statement, parameters, callback);	
 	}
 	
-	all<T>(statement: string, parameters: Array<IColumn>, callback: (err: Error, results: Array<T>) => {}): void {
+	all<T>(statement: string, parameters: Array<IColumn>, callback: (err: Error, results: Array<T>) => void): void {
 		this._db.all(statement, parameters, callback);
 	}
 }
