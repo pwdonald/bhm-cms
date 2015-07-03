@@ -34,7 +34,6 @@ var Sqlite3DAL = (function () {
                 throw err;
             }
             var dbStart = Sqlite3DAL.CreateTableStatement(_this.table.name, _this.table.columns);
-            console.log(dbStart);
             _this._db.run(dbStart, function (err) {
                 if (err) {
                     throw err;
@@ -45,6 +44,7 @@ var Sqlite3DAL = (function () {
     };
     Sqlite3DAL.prototype.query = function (statement, parameters, callback) {
         var results = [];
+        console.log(statement);
         this._db.each(statement, parameters, function (err, result) {
             if (err) {
                 callback(err, []);

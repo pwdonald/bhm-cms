@@ -7,42 +7,44 @@ var chai = require('chai'),
 chai.use(sinonChai);
 
 describe('Author Service', function () {
-	var sandbox,
-		service,
-		FAKE_ID = 0;
+	var FAKE_ID = 0;
+	var sandbox;
 
 	beforeEach(function (done) {
 		sandbox = sinon.sandbox.create();
-		try {
-			AuthorService.GetInstance(function(_service) {
-				service = _service;
-				done();
-			});
-		} catch (e) {
-			done(e);
-		}
+		AuthorService.GetInstance(function (_service) {
+			sandbox.service = _service;
+			done();
+		});
 	});
 
 	afterEach(function () {
 		sandbox.restore();
 	});
 
-	describe('#create(id, dto, callback)', function () {
-		var authorDto = {},
+	describe('#create(dto, callback)', function () {
+		var authorDto = {
+			firstname: 'test',
+			lastname: 'test',
+			alias: 'test'
+		},
 			newAuthor;
 
 		before(function (done) {
-			try {
-				service.post(FAKE_ID, authorDto, function (_author) {
+			sandbox = sinon.sandbox.create();
+			AuthorService.GetInstance(function (_service) {
+				_service.create(authorDto, function (err, _author) {
+					if (err) {
+						done(err);
+					}
 					newAuthor = _author;
 					done();
 				});
-			} catch (e) {
-				done(e);
-			}
+			});
 		});
+		
 		it('should create a new author with id', function (done) {
-			expect(service.post).to.have.been.called;
+			// expect(sandbox.service.create).to.have.been.called;
 			expect(newAuthor).to.equal(authorDto);
 			done();
 		});
@@ -54,7 +56,7 @@ describe('Author Service', function () {
 		it('should return some data specific to id', function (done) {
 			before(function (done) {
 				try {
-					service.get(FAKE_ID, function (_author) {
+					sandbox.service.get(FAKE_ID, function (_author) {
 						rtnAuthor = _author;
 						done();
 					});
@@ -75,7 +77,7 @@ describe('Author Service', function () {
 
 		before(function (done) {
 			try {
-				service.getList('term', 1, function (_list) {
+				sandbox.service.getList('term', 1, function (_list) {
 					rtnAuthorList = _list;
 					done();
 				});
@@ -95,7 +97,7 @@ describe('Author Service', function () {
 
 		before(function (done) {
 			try {
-				service.update(FAKE_ID, { firstname: 'test' }, function (_updated) {
+				sandbox.service.update(FAKE_ID, { firstname: 'test' }, function (_updated) {
 					updatedAuthor = _updated;
 					done();
 				});
@@ -116,7 +118,7 @@ describe('Author Service', function () {
 
 		before(function (done) {
 			try {
-				service.remove(FAKE_ID, function (success) {
+				sandbox.service.remove(FAKE_ID, function (success) {
 					result = success;
 					done();
 				});

@@ -4,6 +4,9 @@ import util = require('util');
 import Sqlite3DAL = require('../dataaccess/sqlite3/sqlite3.dal');
 
 class BaseService implements IBaseService {
+	constructor() {
+	}
+	
 	private _entityName: string;
 	public get entityName(): string {
 		return this._entityName;

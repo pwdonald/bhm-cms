@@ -22,14 +22,14 @@ class Sqlite3DAL implements IDAL {
 				columnParams = columnParams.concat(', ');
 			}
 			if (column.key) {
-				columnParams = columnParams.concat(util.format('%s %s PRIMARY KEY ', column.name, column.type));
+				columnParams = columnParams.concat(util.format('%s %s PRIMARY KEY autoincrement ', column.name, column.type));
 			} else if (column.defaultValue) {
 				columnParams = columnParams.concat(util.format('%s %s DEFAULT %s', column.name, column.type, column.defaultValue));
 			} else {
 				columnParams = columnParams.concat(util.format('%s %s', column.name, column.type));
 			}
 		});
-		
+
 		return util.format('%s (%s)', sqlStatement, columnParams);
 	}
 
@@ -51,16 +51,19 @@ class Sqlite3DAL implements IDAL {
 		});
 	}
 	
+	// TODO: ADD EXEC METHOD FOR INSERT THAT RETURNS LAST ROW ID
+	// exec<T>(statement: string, paramt)
+
 	query<T>(statement: string, parameters: Array<IColumn>, callback: (err: Error, results: Array<T>) => void): void {
 		var results: any[] = [];
-		
+
 		this._db.each(statement, parameters, (err: Error, result: any) => {
 			if (err) {
 				callback(err, []);
 			}
-			
+
 			results.push(result);
-		},(err: Error, count: number) => {
+		}, (err: Error, count: number) => {
 			if (err) {
 				callback(err, []);
 			}
@@ -68,11 +71,11 @@ class Sqlite3DAL implements IDAL {
 			callback(null, results);
 		});
 	}
-	
+
 	get<T>(statement: string, parameters: Array<IColumn>, callback: (err: Error, result: T) => void): void {
-		this._db.get(statement, parameters, callback);	
+		this._db.get(statement, parameters, callback);
 	}
-	
+
 	all<T>(statement: string, parameters: Array<IColumn>, callback: (err: Error, results: Array<T>) => void): void {
 		this._db.all(statement, parameters, callback);
 	}

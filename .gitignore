@@ -33,4 +33,4 @@ typings
 
 models/**/*.js
 models/**/*.js.map
-
+data.db
