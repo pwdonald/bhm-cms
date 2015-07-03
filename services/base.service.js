@@ -24,12 +24,40 @@ var BaseService = (function () {
         enumerable: true,
         configurable: true
     });
-    BaseService.GetInstance = function (entityTable, callback) {
-        var _instance = new BaseService();
+    BaseService.SetupTable = function () {
+        var columns = [];
+        columns.push({
+            name: 'id',
+            type: 'integer',
+            key: true
+        });
+        return {
+            name: 'NewTable',
+            columns: columns
+        };
+    };
+    BaseService.GetInstance = function (callback) {
+        var _instance = new this();
+        var entityTable = this.SetupTable();
         _instance._entityName = entityTable.name;
         _instance.dataAcceesLayer = new Sqlite3DAL(entityTable, function (dal) {
             _instance.dataAcceesLayer = dal;
             callback(_instance);
+        });
+    };
+    BaseService.prototype.create = function (dto, callback) {
+        var keys = Object.getOwnPropertyNames(dto);
+        keys = keys.filter(function (key) {
+            if (key === 'id') {
+                return false;
+            }
+            return true;
+        });
+        var sqlQuery = util.format('INSERT INTO %s (%s) VALUES (%s)', this.entityName, keys.join(','), keys.map(function (key) {
+            return '\'' + dto[key] + '\'';
+        }));
+        this.dataAcceesLayer.query(sqlQuery, [], function (err, results) {
+            callback(err, results[0]);
         });
     };
     BaseService.prototype.get = function (id, callback) {
@@ -51,19 +79,18 @@ var BaseService = (function () {
         var sqlQuery = util.format('UPDATE %s ', this.entityName);
         var dtoKeys = Object.getOwnPropertyNames(dto);
         dtoKeys.forEach(function (key, index) {
-            if (index > 0) {
-                sqlQuery.concat(util.format(', %s = \'%s\'', key, dto[key]));
-            }
-            else {
-                sqlQuery.concat(util.format('SET %s = \'%s\', ', key, dto[key]));
+            if (key !== 'id') {
+                if (index > 0) {
+                    sqlQuery.concat(util.format(', %s = \'%s\'', key, dto[key]));
+                }
+                else {
+                    sqlQuery.concat(util.format('SET %s = \'%s\', ', key, dto[key]));
+                }
             }
         });
         sqlQuery.concat(util.format(' WHERE %s = %s', 'id', id));
         this.dataAcceesLayer.query(sqlQuery, [], function (err, results) {
-            if (err) {
-                callback(err, null);
-            }
-            callback(null, results[0]);
+            callback(err, results[0]);
         });
     };
     BaseService.prototype.remove = function (id, callback) {

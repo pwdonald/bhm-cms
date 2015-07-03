@@ -2,7 +2,7 @@ var chai = require('chai'),
 	sinon = require('sinon'),
 	sinonChai = require('sinon-chai'),
 	expect = chai.expect,
-	SectionModel = require('../../../models/section/section.model');
+	AuthorService = require('../../../services/author/author.service');
 
 chai.use(sinonChai);
 
@@ -14,8 +14,8 @@ describe('Author Service', function () {
 	beforeEach(function (done) {
 		sandbox = sinon.sandbox.create();
 		try {
-			AuthorService.GetInstance((service) => {
-				service = service;
+			AuthorService.GetInstance(function(_service) {
+				service = _service;
 				done();
 			});
 		} catch (e) {

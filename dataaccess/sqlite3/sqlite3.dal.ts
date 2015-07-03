@@ -15,25 +15,22 @@ class Sqlite3DAL implements IDAL {
 
 	static CreateTableStatement(tableName: string, columns: Array<IColumn>): string {
 		var sqlStatement: string = util.format('CREATE TABLE IF NOT EXISTS %s ', tableName),
-			columnParams: string = ' (';
+			columnParams = '';
 
 		columns.forEach((column: IColumn, index: number) => {
 			if (index > 0) {
-				columnParams.concat(', ');
+				columnParams = columnParams.concat(', ');
 			}
 			if (column.key) {
-				columnParams.concat(util.format('%s %s PRIMARY KEY ', column.name, column.type));
+				columnParams = columnParams.concat(util.format('%s %s PRIMARY KEY ', column.name, column.type));
 			} else if (column.defaultValue) {
-				columnParams.concat(util.format('%s %s DEFAULT %s', column.name, column.type, column.defaultValue));
+				columnParams = columnParams.concat(util.format('%s %s DEFAULT %s', column.name, column.type, column.defaultValue));
 			} else {
-				columnParams.concat(util.format('%s %s', column.name, column.type));
+				columnParams = columnParams.concat(util.format('%s %s', column.name, column.type));
 			}
 		});
 		
-		// finalize the parameters string concat to sqlStatement
-		sqlStatement.concat(columnParams.concat(')'));
-
-		return sqlStatement;
+		return util.format('%s (%s)', sqlStatement, columnParams);
 	}
 
 	private initialize(callback: () => void): void {
@@ -43,6 +40,7 @@ class Sqlite3DAL implements IDAL {
 			}
 
 			var dbStart = Sqlite3DAL.CreateTableStatement(this.table.name, this.table.columns);
+
 			this._db.run(dbStart, (err: Error) => {
 				if (err) {
 					throw err;

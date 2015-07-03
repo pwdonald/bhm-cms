@@ -10,23 +10,22 @@ var Sqlite3DAL = (function () {
         });
     }
     Sqlite3DAL.CreateTableStatement = function (tableName, columns) {
-        var sqlStatement = util.format('CREATE TABLE IF NOT EXISTS %s ', tableName), columnParams = ' (';
+        var sqlStatement = util.format('CREATE TABLE IF NOT EXISTS %s ', tableName), columnParams = '';
         columns.forEach(function (column, index) {
             if (index > 0) {
-                columnParams.concat(', ');
+                columnParams = columnParams.concat(', ');
             }
             if (column.key) {
-                columnParams.concat(util.format('%s %s PRIMARY KEY ', column.name, column.type));
+                columnParams = columnParams.concat(util.format('%s %s PRIMARY KEY ', column.name, column.type));
             }
             else if (column.defaultValue) {
-                columnParams.concat(util.format('%s %s DEFAULT %s', column.name, column.type, column.defaultValue));
+                columnParams = columnParams.concat(util.format('%s %s DEFAULT %s', column.name, column.type, column.defaultValue));
             }
             else {
-                columnParams.concat(util.format('%s %s', column.name, column.type));
+                columnParams = columnParams.concat(util.format('%s %s', column.name, column.type));
             }
         });
-        sqlStatement.concat(columnParams.concat(')'));
-        return sqlStatement;
+        return util.format('%s (%s)', sqlStatement, columnParams);
     };
     Sqlite3DAL.prototype.initialize = function (callback) {
         var _this = this;
@@ -35,6 +34,7 @@ var Sqlite3DAL = (function () {
                 throw err;
             }
             var dbStart = Sqlite3DAL.CreateTableStatement(_this.table.name, _this.table.columns);
+            console.log(dbStart);
             _this._db.run(dbStart, function (err) {
                 if (err) {
                     throw err;

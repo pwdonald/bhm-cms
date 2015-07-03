@@ -20,9 +20,24 @@ class BaseService implements IBaseService {
 	public set dataAcceesLayer(v: IDAL) {
 		this._dataAcceesLayer = v;
 	}
+	
+	static SetupTable(): ITable {
+		var columns: Array<IColumn> = [];
+		columns.push({
+			name: 'id',
+			type: 'integer',
+			key: true
+		});
+		
+		return (<ITable> {
+			name: 'NewTable',
+			columns: columns
+		});
+	}
 
-	static GetInstance(entityTable: ITable, callback: (service: IBaseService) => void): void {
-		var _instance = new BaseService();
+	static GetInstance(callback: (service: IBaseService) => void): void {
+		var _instance = new this();
+		var entityTable = this.SetupTable();
 
 		_instance._entityName = entityTable.name;
 		_instance.dataAcceesLayer = new Sqlite3DAL(entityTable, (dal: Sqlite3DAL) => {
