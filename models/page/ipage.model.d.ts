@@ -19,5 +19,5 @@ interface IPage extends IBaseModel {
 	
 	getPageInfo(): IPageDTO;
 	addChildSection(section: ISectionDTO, callback: (_updatedPage: IPage) => {}): void;
-	removeChildSection(id: string, callback: (_updatedPage: IPage) => {}): void;
+	removeChildSection(id: number, callback: (_updatedPage: IPage) => {}): void;
 }

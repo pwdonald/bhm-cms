@@ -3,12 +3,14 @@
 import util = require('util');
 import sqlite3 = require('sqlite3');
 
+var config: any = require('../../package.json');
+
 class Sqlite3DAL implements IDAL {
 	private _db: sqlite3.Database;
 
-	constructor(private table: ITable, callback: (dal: Sqlite3DAL) => void) {
+	constructor(private table: ITable, callback: (dal: Sqlite3DAL) => void, dbName: string = config.data.name) {
 		// load the db, set it up
-		this.initialize(() => {
+		this.initialize(dbName, () => {
 			callback(this);
 		});
 	}
@@ -33,8 +35,8 @@ class Sqlite3DAL implements IDAL {
 		return util.format('%s (%s)', sqlStatement, columnParams);
 	}
 
-	private initialize(callback: () => void): void {
-		this._db = new sqlite3.Database('data.db', (err: Error) => {
+	private initialize(dbName: string, callback: () => void): void {
+		this._db = new sqlite3.Database(dbName, (err: Error) => {
 			if (err) {
 				throw err;
 			}
@@ -51,13 +53,18 @@ class Sqlite3DAL implements IDAL {
 		});
 	}
 	
-	// TODO: ADD EXEC METHOD FOR INSERT THAT RETURNS LAST ROW ID
-	// exec<T>(statement: string, paramt)
+	run(statement: string, callback: (err: Error, resultRowId: number, affectedRows: number) => void): void {
+		this._db.run(statement, function(err: Error) {
+			var statementResult: any = this;
+			
+			callback(err, this.lastID, this.changes);
+		});
+	}
 
-	query<T>(statement: string, parameters: Array<IColumn>, callback: (err: Error, results: Array<T>) => void): void {
+	query<T>(statement: string, callback: (err: Error, results: Array<T>) => void): void {
 		var results: any[] = [];
 
-		this._db.each(statement, parameters, (err: Error, result: any) => {
+		this._db.each(statement, (err: Error, result: any) => {
 			if (err) {
 				callback(err, []);
 			}
@@ -72,12 +79,12 @@ class Sqlite3DAL implements IDAL {
 		});
 	}
 
-	get<T>(statement: string, parameters: Array<IColumn>, callback: (err: Error, result: T) => void): void {
-		this._db.get(statement, parameters, callback);
+	get<T>(statement: string, callback: (err: Error, result: T) => void): void {
+		this._db.get(statement, callback);
 	}
 
-	all<T>(statement: string, parameters: Array<IColumn>, callback: (err: Error, results: Array<T>) => void): void {
-		this._db.all(statement, parameters, callback);
+	all<T>(statement: string, callback: (err: Error, results: Array<T>) => void): void {
+		this._db.all(statement, callback);
 	}
 }
 

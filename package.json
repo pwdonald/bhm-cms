@@ -25,5 +25,8 @@
     "sinon": "^1.15.3",
     "sinon-chai": "^2.8.0",
     "tsd": "^0.6.3"
+  },
+  "data": {
+    "name": "data.db"
   }
 }

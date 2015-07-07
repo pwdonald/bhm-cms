@@ -3,7 +3,7 @@
 import BaseModel = require('../base.model');
 
 class AuthorDTO implements IAuthorDTO {
-	constructor(public id: string,
+	constructor(public id: number,
 		public firstname: string,
 		public lastname: string,
 		public alias: string,

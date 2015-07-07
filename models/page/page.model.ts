@@ -5,7 +5,7 @@ import AuthorModel = require('../author/author.model');
 import SectionModel = require('../section/section.model');
 
 class PageDTO implements IPageDTO {
-	constructor(public id: string,
+	constructor(public id: number,
 		public title: string,
 		public description: string,
 		public tags: string,
@@ -121,9 +121,9 @@ class PageModel extends BaseModel implements IPage, IPageDTO {
 		this.save(callback);
 	}
 
-	removeChildSection(id: string, callback: (_updatedPage: IPage) => {}) {
+	removeChildSection(id: number, callback: (_updatedPage: IPage) => {}) {
 		this.sections = this.sections.filter((value: ISection) => {
-			return (value.id.trim() === id.trim() ? false : true);
+			return (value.id === id ? false : true);
 		});
 
 		this.save(callback);

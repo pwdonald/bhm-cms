@@ -38,7 +38,7 @@ class BaseService implements IBaseService {
 		});
 	}
 
-	static GetInstance(callback: (service: IBaseService) => void): void {
+	static GetInstance(callback: (service: IBaseService) => void, dbName?: string): void {
 		var _instance = new this();
 		var entityTable = this.SetupTable();
 
@@ -46,7 +46,7 @@ class BaseService implements IBaseService {
 		_instance.dataAcceesLayer = new Sqlite3DAL(entityTable, (dal: Sqlite3DAL) => {
 			_instance.dataAcceesLayer = dal;
 			callback(_instance);
-		});
+		}, dbName);
 	}
 
 	create(dto: IBaseModelDTO, callback: (err: Error, result: IBaseModelDTO) => void): void {
@@ -67,15 +67,15 @@ class BaseService implements IBaseService {
 				return '\'' + dto[key] + '\''
 			}));
 			
-		this.dataAcceesLayer.query<IBaseModelDTO>(sqlQuery, [], (err: Error, results: Array<IBaseModelDTO>) => {
-			callback(err, results[0]);
+		this.dataAcceesLayer.run(sqlQuery, (err: Error, resultRowId: number, affectedRowCount: number) => {
+			dto.id = resultRowId;
+			callback(err, dto);
 		});
-
 	}
 
 	get(id: string, callback: (err: Error, result: IBaseModelDTO) => {}): void {
 		var sqlQuery: string = util.format('SELECT * FROM %s WHERE id = %s', this.entityName, id);
-		this.dataAcceesLayer.get<IBaseModelDTO>(sqlQuery, [], callback);
+		this.dataAcceesLayer.get<IBaseModelDTO>(sqlQuery, callback);
 	}
 
 	getList(searchTerm: string, column: IColumn, pageNumber: number, perPage: number, callback: (err: Error, results: Array<IBaseModelDTO>) => void): void {
@@ -89,7 +89,7 @@ class BaseService implements IBaseService {
 
 		var sqlQuery: string = util.format('SELECT * FROM %s WHERE %s LIKE \'%s\' AND id > %d ORDER BY id, %s LIMIT %d', searchParameters);
 
-		this.dataAcceesLayer.query<IBaseModelDTO>(sqlQuery, [], callback);
+		this.dataAcceesLayer.query<IBaseModelDTO>(sqlQuery, callback);
 	}
 
 	update(id: string, dto: IBaseModelDTO, callback: (err: Error, result: IBaseModelDTO) => void): void {
@@ -109,7 +109,7 @@ class BaseService implements IBaseService {
 
 		sqlQuery.concat(util.format(' WHERE %s = %s', 'id', id));
 
-		this.dataAcceesLayer.query<IBaseModelDTO>(sqlQuery, [], (err: Error, results: Array<IBaseModelDTO>) => {
+		this.dataAcceesLayer.query<IBaseModelDTO>(sqlQuery, (err: Error, results: Array<IBaseModelDTO>) => {
 			callback(err, results[0]);
 		});
 	}

@@ -4,7 +4,7 @@ import BaseModel = require('../base.model');
 import AuthorModel = require('../author/author.model');
 
 class SectionDTO implements ISectionDTO {
-	constructor(public id: string,
+	constructor(public id: number,
 				public title: string,
 				public subtitle: string,
 				public author: IAuthorDTO,

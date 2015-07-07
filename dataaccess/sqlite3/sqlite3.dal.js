@@ -1,11 +1,13 @@
 /// <reference path="../../_references.d.ts" />
 var util = require('util');
 var sqlite3 = require('sqlite3');
+var config = require('../../package.json');
 var Sqlite3DAL = (function () {
-    function Sqlite3DAL(table, callback) {
+    function Sqlite3DAL(table, callback, dbName) {
         var _this = this;
+        if (dbName === void 0) { dbName = config.data.name; }
         this.table = table;
-        this.initialize(function () {
+        this.initialize(dbName, function () {
             callback(_this);
         });
     }
@@ -16,7 +18,7 @@ var Sqlite3DAL = (function () {
                 columnParams = columnParams.concat(', ');
             }
             if (column.key) {
-                columnParams = columnParams.concat(util.format('%s %s PRIMARY KEY ', column.name, column.type));
+                columnParams = columnParams.concat(util.format('%s %s PRIMARY KEY autoincrement ', column.name, column.type));
             }
             else if (column.defaultValue) {
                 columnParams = columnParams.concat(util.format('%s %s DEFAULT %s', column.name, column.type, column.defaultValue));
@@ -27,9 +29,9 @@ var Sqlite3DAL = (function () {
         });
         return util.format('%s (%s)', sqlStatement, columnParams);
     };
-    Sqlite3DAL.prototype.initialize = function (callback) {
+    Sqlite3DAL.prototype.initialize = function (dbName, callback) {
         var _this = this;
-        this._db = new sqlite3.Database('data.db', function (err) {
+        this._db = new sqlite3.Database(dbName, function (err) {
             if (err) {
                 throw err;
             }
@@ -42,10 +44,15 @@ var Sqlite3DAL = (function () {
             });
         });
     };
-    Sqlite3DAL.prototype.query = function (statement, parameters, callback) {
+    Sqlite3DAL.prototype.run = function (statement, callback) {
+        this._db.run(statement, function (err) {
+            var statementResult = this;
+            callback(err, this.lastID, this.changes);
+        });
+    };
+    Sqlite3DAL.prototype.query = function (statement, callback) {
         var results = [];
-        console.log(statement);
-        this._db.each(statement, parameters, function (err, result) {
+        this._db.each(statement, function (err, result) {
             if (err) {
                 callback(err, []);
             }
@@ -57,11 +64,11 @@ var Sqlite3DAL = (function () {
             callback(null, results);
         });
     };
-    Sqlite3DAL.prototype.get = function (statement, parameters, callback) {
-        this._db.get(statement, parameters, callback);
+    Sqlite3DAL.prototype.get = function (statement, callback) {
+        this._db.get(statement, callback);
     };
-    Sqlite3DAL.prototype.all = function (statement, parameters, callback) {
-        this._db.all(statement, parameters, callback);
+    Sqlite3DAL.prototype.all = function (statement, callback) {
+        this._db.all(statement, callback);
     };
     return Sqlite3DAL;
 })();

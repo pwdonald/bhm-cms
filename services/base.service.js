@@ -36,14 +36,14 @@ var BaseService = (function () {
             columns: columns
         };
     };
-    BaseService.GetInstance = function (callback) {
+    BaseService.GetInstance = function (callback, dbName) {
         var _instance = new this();
         var entityTable = this.SetupTable();
         _instance._entityName = entityTable.name;
         _instance.dataAcceesLayer = new Sqlite3DAL(entityTable, function (dal) {
             _instance.dataAcceesLayer = dal;
             callback(_instance);
-        });
+        }, dbName);
     };
     BaseService.prototype.create = function (dto, callback) {
         var keys = Object.getOwnPropertyNames(dto);
@@ -56,13 +56,14 @@ var BaseService = (function () {
         var sqlQuery = util.format('INSERT INTO %s (%s) VALUES (%s)', this.entityName, keys.join(','), keys.map(function (key) {
             return '\'' + dto[key] + '\'';
         }));
-        this.dataAcceesLayer.query(sqlQuery, [], function (err, results) {
-            callback(err, results[0]);
+        this.dataAcceesLayer.run(sqlQuery, function (err, resultRowId, affectedRowCount) {
+            dto.id = resultRowId;
+            callback(err, dto);
         });
     };
     BaseService.prototype.get = function (id, callback) {
         var sqlQuery = util.format('SELECT * FROM %s WHERE id = %s', this.entityName, id);
-        this.dataAcceesLayer.get(sqlQuery, [], callback);
+        this.dataAcceesLayer.get(sqlQuery, callback);
     };
     BaseService.prototype.getList = function (searchTerm, column, pageNumber, perPage, callback) {
         var searchParameters = [
@@ -73,7 +74,7 @@ var BaseService = (function () {
             perPage
         ];
         var sqlQuery = util.format('SELECT * FROM %s WHERE %s LIKE \'%s\' AND id > %d ORDER BY id, %s LIMIT %d', searchParameters);
-        this.dataAcceesLayer.query(sqlQuery, [], callback);
+        this.dataAcceesLayer.query(sqlQuery, callback);
     };
     BaseService.prototype.update = function (id, dto, callback) {
         var sqlQuery = util.format('UPDATE %s ', this.entityName);
@@ -89,7 +90,7 @@ var BaseService = (function () {
             }
         });
         sqlQuery.concat(util.format(' WHERE %s = %s', 'id', id));
-        this.dataAcceesLayer.query(sqlQuery, [], function (err, results) {
+        this.dataAcceesLayer.query(sqlQuery, function (err, results) {
             callback(err, results[0]);
         });
     };

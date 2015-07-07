@@ -7,32 +7,27 @@ var chai = require('chai'),
 chai.use(sinonChai);
 
 describe('Author Service', function () {
-	var FAKE_ID = 0;
-	var sandbox;
+	var FAKE_ID = 1;
+	var newAuthor;
 
-	beforeEach(function (done) {
-		sandbox = sinon.sandbox.create();
+	var getService = function (callback) {
 		AuthorService.GetInstance(function (_service) {
-			sandbox.service = _service;
-			done();
-		});
-	});
-
-	afterEach(function () {
-		sandbox.restore();
-	});
+			callback(_service);
+		}, ':memory:');
+	};
 
 	describe('#create(dto, callback)', function () {
+		var sandbox;
+
 		var authorDto = {
 			firstname: 'test',
 			lastname: 'test',
 			alias: 'test'
-		},
-			newAuthor;
+		};
 
 		before(function (done) {
 			sandbox = sinon.sandbox.create();
-			AuthorService.GetInstance(function (_service) {
+			getService(function (_service) {
 				_service.create(authorDto, function (err, _author) {
 					if (err) {
 						done(err);
@@ -42,9 +37,14 @@ describe('Author Service', function () {
 				});
 			});
 		});
-		
+
+		after(function (done) {
+			sandbox.restore();
+			done();
+		});
+
 		it('should create a new author with id', function (done) {
-			// expect(sandbox.service.create).to.have.been.called;
+			expect(newAuthor.id).to.exist;
 			expect(newAuthor).to.equal(authorDto);
 			done();
 		});
@@ -52,84 +52,102 @@ describe('Author Service', function () {
 
 	describe('#get(id, callback)', function () {
 		var rtnAuthor;
+		var sandbox;
+		var secondAuthor = {
+			firstname: 'test2',
+			email: 'test2@test.com',
+			location: 'testUSA',
+			phone: '2222222222',
+			lastname: 'test2',
+			alias: 'test2'
+		};
 
-		it('should return some data specific to id', function (done) {
-			before(function (done) {
-				try {
-					sandbox.service.get(FAKE_ID, function (_author) {
+		before(function (done) {
+			sandbox = sinon.sandbox.create();
+			getService(function (_service) {
+				_service.create(secondAuthor, function (err, _author) {
+					_service.get(_author.id, function (err, _author) {
+						if (err) {
+							done(err);
+						}
+						
 						rtnAuthor = _author;
 						done();
 					});
-				} catch (e) {
-					done(e);
-				}
-			});
-
-			it('should return a specific author with the given id', function (done) {
-				expect(rtnAuthor).to.be.an.object;
-				done();
+				});
 			});
 		});
-	});
 
-	describe('#getList(searchTerm, page, callback)', function () {
-		var rtnAuthorList;
-
-		before(function (done) {
-			try {
-				sandbox.service.getList('term', 1, function (_list) {
-					rtnAuthorList = _list;
-					done();
-				});
-			} catch (e) {
-				done(e);
-			}
+		after(function (done) {
+			sandbox.restore();
+			done();
 		});
 
-		it('should return a list of author data paginated', function (done) {
-			expect(rtnAuthorList).to.be.an.array;
+		it('should return some data specific to id', function (done) {
+			expect(rtnAuthor.id).to.exist;
+			expect(rtnAuthor.firstname).to.equal('test2');
 			done();
 		});
 	});
 
-	describe('#update(id, dto, callback)', function () {
-		var updatedAuthor;
+	// describe('#getList(searchTerm, page, callback)', function () {
+	// 	var rtnAuthorList;
 
-		before(function (done) {
-			try {
-				sandbox.service.update(FAKE_ID, { firstname: 'test' }, function (_updated) {
-					updatedAuthor = _updated;
-					done();
-				});
-			} catch (e) {
-				done(e);
-			}
-		});
+	// 	before(function (done) {
+	// 		try {
+	// 			sandbox.service.getList('term', 1, function (_list) {
+	// 				rtnAuthorList = _list;
+	// 				done();
+	// 			});
+	// 		} catch (e) {
+	// 			done(e);
+	// 		}
+	// 	});
 
-		it('should update the id with the data transfer object', function (done) {
-			expect(updatedAuthor).to.be.an.object;
-			expect(updatedAuthor.firstname).to.equal('test');
-			done();
-		});
-	});
+	// 	it('should return a list of author data paginated', function (done) {
+	// 		expect(rtnAuthorList).to.be.an.array;
+	// 		done();
+	// 	});
+	// });
 
-	describe('#remove(id, callback)', function () {
-		var result;
+	// describe('#update(id, dto, callback)', function () {
+	// 	var updatedAuthor;
 
-		before(function (done) {
-			try {
-				sandbox.service.remove(FAKE_ID, function (success) {
-					result = success;
-					done();
-				});
-			} catch (e) {
-				done(e);
-			}
-		});
+	// 	before(function (done) {
+	// 		try {
+	// 			sandbox.service.update(FAKE_ID, { firstname: 'test' }, function (_updated) {
+	// 				updatedAuthor = _updated;
+	// 				done();
+	// 			});
+	// 		} catch (e) {
+	// 			done(e);
+	// 		}
+	// 	});
 
-		it('should remove the id from the data source', function (done) {
-			expect(result).to.be.true;
-			done();
-		});
-	});
+	// 	it('should update the id with the data transfer object', function (done) {
+	// 		expect(updatedAuthor).to.be.an.object;
+	// 		expect(updatedAuthor.firstname).to.equal('test');
+	// 		done();
+	// 	});
+	// });
+
+	// describe('#remove(id, callback)', function () {
+	// 	var result;
+
+	// 	before(function (done) {
+	// 		try {
+	// 			sandbox.service.remove(FAKE_ID, function (success) {
+	// 				result = success;
+	// 				done();
+	// 			});
+	// 		} catch (e) {
+	// 			done(e);
+	// 		}
+	// 	});
+
+	// 	it('should remove the id from the data source', function (done) {
+	// 		expect(result).to.be.true;
+	// 		done();
+	// 	});
+	// });
 });

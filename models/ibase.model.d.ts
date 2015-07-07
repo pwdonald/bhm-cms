@@ -1,8 +1,8 @@
 interface IBaseModelDTO {
-	id: string;
+	id: number;
 }
 
 interface IBaseModel {
-	id: string;
+	id: number;
 	save(callback: (model: IBaseModel) => {}): void;
 }

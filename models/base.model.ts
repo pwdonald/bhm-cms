@@ -1,11 +1,11 @@
 /// <reference path="../_references.d.ts" />
 
 class BaseModel implements IBaseModel {
-	private _id: string;
-	public get id(): string {
+	private _id: number;
+	public get id(): number {
 		return this._id;
 	}
-	public set id(v: string) {
+	public set id(v: number) {
 		this._id = v;
 	}
 
