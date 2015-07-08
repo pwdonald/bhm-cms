@@ -77,14 +77,14 @@ var BaseService = (function () {
         dtoKeys.forEach(function (key, index) {
             if (key !== 'id') {
                 if (index > 0) {
-                    sqlQuery.concat(util.format(', %s = \'%s\'', key, dto[key]));
+                    sqlQuery = sqlQuery.concat(util.format(', %s = \'%s\'', key, dto[key]));
                 }
                 else {
-                    sqlQuery.concat(util.format('SET %s = \'%s\', ', key, dto[key]));
+                    sqlQuery = sqlQuery.concat(util.format('SET %s = \'%s\'', key, dto[key]));
                 }
             }
         });
-        sqlQuery.concat(util.format(' WHERE %s = %s', 'id', id));
+        sqlQuery = sqlQuery.concat(util.format(' WHERE %s = %s', 'id', id));
         this.dataAcceesLayer.query(sqlQuery, function (err, results) {
             callback(err, results[0]);
         });

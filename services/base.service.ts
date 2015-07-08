@@ -102,14 +102,14 @@ class BaseService implements IBaseService {
 		dtoKeys.forEach((key: string, index: number) => {
 			if (key !== 'id') {
 				if (index > 0) {
-					sqlQuery.concat(util.format(', %s = \'%s\'', key, dto[key]));
+					sqlQuery = sqlQuery.concat(util.format(', %s = \'%s\'', key, dto[key]));
 				} else {
-					sqlQuery.concat(util.format('SET %s = \'%s\', ', key, dto[<string>key]));
+					sqlQuery = sqlQuery.concat(util.format('SET %s = \'%s\'', key, dto[<string>key]));
 				}
 			}
 		});
 
-		sqlQuery.concat(util.format(' WHERE %s = %s', 'id', id));
+		sqlQuery = sqlQuery.concat(util.format(' WHERE %s = %s', 'id', id));
 
 		this.dataAcceesLayer.query<IBaseModelDTO>(sqlQuery, (err: Error, results: Array<IBaseModelDTO>) => {
 			callback(err, results[0]);

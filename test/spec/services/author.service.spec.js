@@ -90,7 +90,7 @@ describe('Author Service', function () {
 		});
 	});
 
-	describe('#getList(searchTerm, page, callback)', function () {
+	describe('#getList(searchTerm, page, perpage, callback, columnId)', function () {
 		var rtnAuthorList;
 		var sandbox;
 		var thirdAuthor = {
@@ -138,26 +138,57 @@ describe('Author Service', function () {
 		});
 	});
 
-	// describe('#update(id, dto, callback)', function () {
-	// 	var updatedAuthor;
+	describe('#update(id, dto, callback)', function () {
+		var updatedAuthor;
+		var fourthAuthor = {
+			firstname: 'test4',
+			email: 'test4@test.com',
+			location: 'testUSA',
+			phone: '4444444444',
+			lastname: 'test4',
+			alias: 'test4'
+		};
 
-	// 	before(function (done) {
-	// 		try {
-	// 			sandbox.service.update(FAKE_ID, { firstname: 'test' }, function (_updated) {
-	// 				updatedAuthor = _updated;
-	// 				done();
-	// 			});
-	// 		} catch (e) {
-	// 			done(e);
-	// 		}
-	// 	});
+		before(function (done) {
+			sandbox = sinon.sandbox.create();
+			getService(function (_service) {
 
-	// 	it('should update the id with the data transfer object', function (done) {
-	// 		expect(updatedAuthor).to.be.an.object;
-	// 		expect(updatedAuthor.firstname).to.equal('test');
-	// 		done();
-	// 	});
-	// });
+				_service.create(fourthAuthor, function (err, _author1) {
+					if (err) {
+						done(err);
+					}
+					_service.create(fourthAuthor, function (err, _author2) {
+						if (err) {
+							done(err);
+						}
+						_author2.firstname = 'updated';
+						_author2.lastname = 'author';
+						_author2.alias = 'updated_author'
+						_service.update(_author2.id, _author2, function (err, result) {
+							_service.get(_author2.id, function (err, _authorResult) {
+								if (err) {
+									done(err);
+								}
+								updatedAuthor = _authorResult;
+								done();
+							});
+						});
+					});
+				});
+			});
+		});
+
+		after(function (done) {
+			sandbox.restore();
+			done();
+		});
+
+		it('should update the id with the data transfer object', function (done) {
+			expect(updatedAuthor).to.be.an.object;
+			expect(updatedAuthor.firstname).to.equal('updated');
+			done();
+		});
+	});
 
 	// describe('#remove(id, callback)', function () {
 	// 	var result;
