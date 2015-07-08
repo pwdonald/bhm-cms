@@ -190,23 +190,61 @@ describe('Author Service', function () {
 		});
 	});
 
-	// describe('#remove(id, callback)', function () {
-	// 	var result;
+	describe('#remove(id, callback)', function () {
+		var successResult;
+		var returnedResult;
+		
+		var fifthAuthor = {
+			firstname: 'test5',
+			email: 'test5@test.com',
+			location: 'testUSA',
+			phone: '5555555555',
+			lastname: 'test5',
+			alias: 'test5'
+		};
 
-	// 	before(function (done) {
-	// 		try {
-	// 			sandbox.service.remove(FAKE_ID, function (success) {
-	// 				result = success;
-	// 				done();
-	// 			});
-	// 		} catch (e) {
-	// 			done(e);
-	// 		}
-	// 	});
+		before(function (done) {
+			sandbox = sinon.sandbox.create();
+			getService(function (_service) {
 
-	// 	it('should remove the id from the data source', function (done) {
-	// 		expect(result).to.be.true;
-	// 		done();
-	// 	});
-	// });
+				_service.create(fifthAuthor, function (err, _author1) {
+					if (err) {
+						done(err);
+					}
+					_service.create(fifthAuthor, function (err, _author2) {
+						if (err) {
+							done(err);
+						}
+						
+						_service.remove(_author2.id, function(err, success) {
+							if (err) {
+								done(err);
+							}
+							
+							successResult = success;
+							
+							_service.get(_author2.id, function(err, result) {
+								if (err) {
+									console.log('get removed: ' + _author2.id + ' ' + err);
+									done(err);
+								}
+								
+								returnedResult = result;
+								
+								done();
+							});
+						});
+						
+					});
+				});
+			});
+		});
+
+
+		it('should remove the id from the data source', function (done) {
+			expect(successResult).to.be.true;
+			expect(returnedResult).to.be.an.array;
+			done();
+		});
+	});
 });

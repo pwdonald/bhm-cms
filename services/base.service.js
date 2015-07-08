@@ -90,6 +90,13 @@ var BaseService = (function () {
         });
     };
     BaseService.prototype.remove = function (id, callback) {
+        var sqlQuery = util.format('DELETE FROM %s WHERE id = %s', this.entityName, id);
+        this.dataAcceesLayer.run(sqlQuery, function (err, resultRowId, affectedRowCount) {
+            if (err) {
+                callback(err, null);
+            }
+            callback(null, (affectedRowCount > 0 ? true : false));
+        });
     };
     return BaseService;
 })();

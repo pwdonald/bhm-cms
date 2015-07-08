@@ -117,7 +117,18 @@ class BaseService implements IBaseService {
 	}
 
 	remove(id: string, callback: (err: Error, success: boolean) => void): void {
-
+		var sqlQuery: string = util.format(
+			'DELETE FROM %s WHERE id = %s'
+			, this.entityName
+			, id);
+			
+		this.dataAcceesLayer.run(sqlQuery, (err: Error, resultRowId: number, affectedRowCount: number) => {
+			if (err) {
+				callback(err, null);
+			}
+			
+			callback(null, (affectedRowCount > 0 ? true : false));
+		});
 	}
 }
 
