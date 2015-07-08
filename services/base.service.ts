@@ -4,6 +4,8 @@ import util = require('util');
 import Sqlite3DAL = require('../dataaccess/sqlite3/sqlite3.dal');
 
 class BaseService implements IBaseService {
+	private _table: ITable;
+	
 	constructor() {
 	}
 	
@@ -40,10 +42,10 @@ class BaseService implements IBaseService {
 
 	static GetInstance(callback: (service: IBaseService) => void, dbName?: string): void {
 		var _instance = new this();
-		var entityTable = this.SetupTable();
+		var entityTable = _instance._table = this.SetupTable();
 
 		_instance._entityName = entityTable.name;
-		_instance.dataAcceesLayer = new Sqlite3DAL(entityTable, (dal: Sqlite3DAL) => {
+		_instance.dataAcceesLayer = new Sqlite3DAL(_instance._table, (dal: Sqlite3DAL) => {
 			_instance.dataAcceesLayer = dal;
 			callback(_instance);
 		}, dbName);
@@ -78,17 +80,17 @@ class BaseService implements IBaseService {
 		this.dataAcceesLayer.get<IBaseModelDTO>(sqlQuery, callback);
 	}
 
-	getList(searchTerm: string, column: IColumn, pageNumber: number, perPage: number, callback: (err: Error, results: Array<IBaseModelDTO>) => void): void {
-		var searchParameters: Array<any> = [
-			this.entityName, // FROM
-			searchTerm, // WHERE LIKE
-			(pageNumber * perPage), // START ID (ID >)
-			column.name, // ORDER BY
-			perPage // LIMIT
-		];
-
-		var sqlQuery: string = util.format('SELECT * FROM %s WHERE %s LIKE \'%s\' AND id > %d ORDER BY id, %s LIMIT %d', searchParameters);
-
+	getList(searchTerm: string, pageNumber: number, perPage: number, callback: (err: Error, results: Array<IBaseModelDTO>) => void, columnNumber: number = 0): void {
+		var column = this._table.columns[columnNumber];
+		var sqlQuery: string = util.format(
+			'SELECT * FROM %s WHERE %s LIKE \'%s\' AND id > %s ORDER BY id, %s LIMIT %d'
+			, this.entityName
+			, column.name
+			, '%' + searchTerm + '%'
+			, (pageNumber * perPage)
+			, column.name
+			, perPage);
+			
 		this.dataAcceesLayer.query<IBaseModelDTO>(sqlQuery, callback);
 	}
 

@@ -74,7 +74,6 @@ class Sqlite3DAL implements IDAL {
 			if (err) {
 				callback(err, []);
 			}
-			
 			callback(null, results);
 		});
 	}

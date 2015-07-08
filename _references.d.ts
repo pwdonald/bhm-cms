@@ -15,3 +15,6 @@
 /// <reference path="dataaccess/itable.d.ts" />
 /// <reference path="dataaccess/idal.d.ts" />
 
+// ENUMS
+/// <reference path="services/author/author.service.values.d.ts" />
+

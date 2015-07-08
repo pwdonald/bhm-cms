@@ -58,6 +58,10 @@ class AuthorService extends BaseService {
 		
 		return table;
 	}
+	
+	public getList(searchTerm: string, pageNumber: number, perPage: number, callback: (err: Error, results: Array<IBaseModelDTO>) => void, searchType: AuthorSearchTypes): void {
+		super.getList(searchTerm, pageNumber, perPage, callback, searchType);
+	}
 }
 
 export = AuthorService;

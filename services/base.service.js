@@ -38,9 +38,9 @@ var BaseService = (function () {
     };
     BaseService.GetInstance = function (callback, dbName) {
         var _instance = new this();
-        var entityTable = this.SetupTable();
+        var entityTable = _instance._table = this.SetupTable();
         _instance._entityName = entityTable.name;
-        _instance.dataAcceesLayer = new Sqlite3DAL(entityTable, function (dal) {
+        _instance.dataAcceesLayer = new Sqlite3DAL(_instance._table, function (dal) {
             _instance.dataAcceesLayer = dal;
             callback(_instance);
         }, dbName);
@@ -65,15 +65,10 @@ var BaseService = (function () {
         var sqlQuery = util.format('SELECT * FROM %s WHERE id = %s', this.entityName, id);
         this.dataAcceesLayer.get(sqlQuery, callback);
     };
-    BaseService.prototype.getList = function (searchTerm, column, pageNumber, perPage, callback) {
-        var searchParameters = [
-            this.entityName,
-            searchTerm,
-            (pageNumber * perPage),
-            column.name,
-            perPage
-        ];
-        var sqlQuery = util.format('SELECT * FROM %s WHERE %s LIKE \'%s\' AND id > %d ORDER BY id, %s LIMIT %d', searchParameters);
+    BaseService.prototype.getList = function (searchTerm, pageNumber, perPage, callback, columnNumber) {
+        if (columnNumber === void 0) { columnNumber = 0; }
+        var column = this._table.columns[columnNumber];
+        var sqlQuery = util.format('SELECT * FROM %s WHERE %s LIKE \'%s\' AND id > %s ORDER BY id, %s LIMIT %d', this.entityName, column.name, '%' + searchTerm + '%', (pageNumber * perPage), column.name, perPage);
         this.dataAcceesLayer.query(sqlQuery, callback);
     };
     BaseService.prototype.update = function (id, dto, callback) {

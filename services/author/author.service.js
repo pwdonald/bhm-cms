@@ -51,6 +51,9 @@ var AuthorService = (function (_super) {
         });
         return table;
     };
+    AuthorService.prototype.getList = function (searchTerm, pageNumber, perPage, callback, searchType) {
+        _super.prototype.getList.call(this, searchTerm, pageNumber, perPage, callback, searchType);
+    };
     return AuthorService;
 })(BaseService);
 module.exports = AuthorService;

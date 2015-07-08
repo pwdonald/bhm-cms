@@ -70,7 +70,7 @@ describe('Author Service', function () {
 						if (err) {
 							done(err);
 						}
-						
+
 						rtnAuthor = _author;
 						done();
 					});
@@ -90,25 +90,53 @@ describe('Author Service', function () {
 		});
 	});
 
-	// describe('#getList(searchTerm, page, callback)', function () {
-	// 	var rtnAuthorList;
+	describe('#getList(searchTerm, page, callback)', function () {
+		var rtnAuthorList;
+		var sandbox;
+		var thirdAuthor = {
+			firstname: 'test3',
+			email: 'test3@test.com',
+			location: 'testUSA',
+			phone: '3333333333',
+			lastname: 'test3',
+			alias: 'test3'
+		};
+		var SEARCHTERM = 'test';
 
-	// 	before(function (done) {
-	// 		try {
-	// 			sandbox.service.getList('term', 1, function (_list) {
-	// 				rtnAuthorList = _list;
-	// 				done();
-	// 			});
-	// 		} catch (e) {
-	// 			done(e);
-	// 		}
-	// 	});
+		before(function (done) {
+			sandbox = sinon.sandbox.create();
+			getService(function (_service) {
 
-	// 	it('should return a list of author data paginated', function (done) {
-	// 		expect(rtnAuthorList).to.be.an.array;
-	// 		done();
-	// 	});
-	// });
+				_service.create(thirdAuthor, function (err, _author) {
+					_service.create(thirdAuthor, function (err, _author) {
+						_service.getList(SEARCHTERM, 0, 10, function (err, _results) {
+							if (err) {
+								done(err);
+							}
+
+							rtnAuthorList = _results;
+
+							done();
+						}, 1);
+					});
+				});
+			});
+		});
+
+		after(function (done) {
+			sandbox.restore();
+			done();
+		});
+
+		it('should return a list of author data paginated', function (done) {
+			expect(rtnAuthorList).to.be.an.array;
+			expect(rtnAuthorList.length).to.equal(2);
+			expect(rtnAuthorList[0]).to.exist;
+			expect(rtnAuthorList[0].firstname).to.equal(thirdAuthor.firstname);
+			expect(rtnAuthorList[0].lastname).to.equal(thirdAuthor.lastname);
+			done();
+		});
+	});
 
 	// describe('#update(id, dto, callback)', function () {
 	// 	var updatedAuthor;
